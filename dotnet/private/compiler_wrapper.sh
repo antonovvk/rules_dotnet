@@ -15,5 +15,7 @@ if [[ $(basename "$COMPILER") == "fsc.dll" ]]; then
 fi
 PATHMAP="$PATHMAP_FLAG:$PWD=."
 
+echo `date`: ./"$@" "$PATHMAP"
+
 # shellcheck disable=SC2145
 ./"$@" "$PATHMAP"
