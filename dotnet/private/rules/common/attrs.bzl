@@ -142,10 +142,6 @@ COMMON_ATTRS = {
         doc = "Whether or not to generate a documentation file.",
         default = True,
     ),
-    "features": attr.string_list(
-        doc = "A list of compiler features (eg InterceptorPreviewNamespaces)",
-        mandatory = False,
-    ),
     "_target_framework": attr.label(
         default = "//dotnet:target_framework",
     ),
