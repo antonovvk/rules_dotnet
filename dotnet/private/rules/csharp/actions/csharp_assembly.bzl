@@ -62,6 +62,7 @@ def AssemblyAction(
         targeting_packs,
         internals_visible_to,
         keyfile,
+        features,
         langversion,
         resources,
         srcs,
@@ -97,6 +98,7 @@ def AssemblyAction(
         targeting_packs: The list of targeting packs to be used.
         internals_visible_to: An optional list of assemblies that can see this assemblies internal symbols.
         keyfile: Specifies a strong name key file of the assembly.
+        features: A list of compiler features (eg InterceptorPreviewNamespaces)
         langversion: Specify language version: Default, ISO-1, ISO-2, 3, 4, 5, 6, 7, 7.1, 7.2, 7.3, or Latest
         resources: The list of resouces to be embedded in the assembly.
         srcs: The list of source (.cs) files that are processed to create the assembly.
@@ -159,6 +161,7 @@ def AssemblyAction(
             default_lang_version,
             defines,
             keyfile,
+            features,
             langversion,
             irefs,
             framework_files,
@@ -203,6 +206,7 @@ def AssemblyAction(
             default_lang_version,
             defines,
             keyfile,
+            features,
             langversion,
             irefs,
             framework_files,
@@ -236,6 +240,7 @@ def AssemblyAction(
             default_lang_version,
             defines,
             keyfile,
+            features,
             langversion,
             irefs,
             framework_files,
@@ -294,6 +299,7 @@ def _compile(
         default_lang_version,
         defines,
         keyfile,
+        features,
         langversion,
         refs,
         framework_files,
@@ -404,6 +410,9 @@ def _compile(
     # keyfile
     if keyfile != None:
         args.add("/keyfile:" + keyfile.path)
+
+    # features
+    args.add_all(features, format_each = "/features:%s")
 
     # spill to a "response file" when the argument list gets too big (Bazel
     # makes that call based on limitations of the OS).

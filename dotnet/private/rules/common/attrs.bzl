@@ -76,11 +76,11 @@ COMMON_ATTRS = {
         doc = "Other libraries that can see the assembly's internal symbols. Using this rather than the InternalsVisibleTo assembly attribute will improve build caching.",
     ),
     "targeting_packs": attr.label_list(
-        doc = """Private dependencies 
+        doc = """Private dependencies
 
         The targeting packs that should be used to build the target.
-        You should use a targeting pack that targets the same framework as the target. 
-        There can be multiple runtime packs for a given target e.g. when a AspNetCore 
+        You should use a targeting pack that targets the same framework as the target.
+        There can be multiple runtime packs for a given target e.g. when a AspNetCore
         application is built you need the base runtime pack and the AspNetCore runtime pack.
         Example runtime packs:
         https://www.nuget.org/packages/NETStandard.Library - .Net Standard 2.0
@@ -128,8 +128,8 @@ COMMON_ATTRS = {
         mandatory = False,
     ),
     "strict_deps": attr.bool(
-        doc = """Whether to use strict dependencies or not. 
-        
+        doc = """Whether to use strict dependencies or not.
+
         This attribute mirrors the DisableTransitiveProjectReferences in MSBuild.
         The default setting of this attribute can be overridden in the toolchain configuration""",
         default = True,
@@ -141,6 +141,10 @@ COMMON_ATTRS = {
     "generate_documentation_file": attr.bool(
         doc = "Whether or not to generate a documentation file.",
         default = True,
+    ),
+    "features": attr.string_list(
+        doc = "A list of compiler features (eg InterceptorPreviewNamespaces)",
+        mandatory = False,
     ),
     "_target_framework": attr.label(
         default = "//dotnet:target_framework",
@@ -167,9 +171,9 @@ COMMON_ATTRS = {
 LIBRARY_COMMON_ATTRS = {
     "exports": attr.label_list(
         doc = """
-        List of targets to add to the dependencies of those that depend on this target. 
+        List of targets to add to the dependencies of those that depend on this target.
         Use this sparingly as it weakens the precision of the build graph.
-        
+
         This attribute does nothing if you don't have strict dependencies enabled.""",
         default = [],
         providers = [DotnetAssemblyCompileInfo, DotnetAssemblyRuntimeInfo],

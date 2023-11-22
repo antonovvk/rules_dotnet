@@ -28,6 +28,7 @@ def _compile_action(ctx, tfm):
         targeting_packs = ctx.attr.targeting_packs,
         internals_visible_to = ctx.attr.internals_visible_to,
         keyfile = ctx.file.keyfile,
+        features = ctx.attr.features,
         langversion = ctx.attr.langversion,
         resources = ctx.files.resources,
         srcs = ctx.files.srcs,
