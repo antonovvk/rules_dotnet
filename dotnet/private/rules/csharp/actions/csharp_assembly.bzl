@@ -60,6 +60,7 @@ def AssemblyAction(
         deps,
         exports,
         targeting_packs,
+        exclude_assembly_patterns,
         internals_visible_to,
         keyfile,
         features,
@@ -164,6 +165,7 @@ def AssemblyAction(
             features,
             langversion,
             irefs,
+            exclude_assembly_patterns,
             framework_files,
             resources,
             srcs,
@@ -209,6 +211,7 @@ def AssemblyAction(
             features,
             langversion,
             irefs,
+            exclude_assembly_patterns,
             framework_files,
             resources,
             srcs + [internals_visible_to_cs],
@@ -243,6 +246,7 @@ def AssemblyAction(
             features,
             langversion,
             irefs,
+            exclude_assembly_patterns,
             framework_files,
             resources,
             srcs,
@@ -302,6 +306,7 @@ def _compile(
         features,
         langversion,
         refs,
+        exclude_assembly_patterns,
         framework_files,
         resources,
         srcs,
@@ -392,7 +397,17 @@ def _compile(
         outputs.append(out_xml)
 
     # assembly references
-    format_ref_arg(args, depset(framework_files, transitive = [refs]))
+    final_refs = depset(framework_files, transitive = [refs]).to_list()
+    if exclude_assembly_patterns:
+        filtered = []
+        for r in final_refs:
+            for suff in exclude_assembly_patterns:
+                if not r.endswith(suff):
+                    filtered.append(r)
+
+        final_refs = filtered
+
+    format_ref_arg(args, final_refs)
 
     # analyzers
     args.add_all(analyzer_assemblies, format_each = "/analyzer:%s")

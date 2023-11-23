@@ -72,6 +72,11 @@ COMMON_ATTRS = {
         default = [],
         allow_empty = True,
     ),
+    "exclude_assembly_patterns": attr.string_list(
+        doc = "Match patterns before populating assembly list, exclude matched from C# compiler command line",
+        default = [],
+        allow_empty = True,
+    ),
     "internals_visible_to": attr.string_list(
         doc = "Other libraries that can see the assembly's internal symbols. Using this rather than the InternalsVisibleTo assembly attribute will improve build caching.",
     ),

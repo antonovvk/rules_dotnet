@@ -23,6 +23,7 @@ def _compile_action(ctx, tfm):
         defines = ctx.attr.defines,
         deps = ctx.attr.deps,
         exports = [],
+        exclude_assembly_patterns = ctx.attr.exclude_assembly_patterns,
         targeting_packs = ctx.attr.targeting_packs,
         internals_visible_to = ctx.attr.internals_visible_to,
         keyfile = ctx.file.keyfile,
