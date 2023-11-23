@@ -402,7 +402,7 @@ def _compile(
         filtered = []
         for r in final_refs:
             for suff in exclude_assembly_patterns:
-                if not r.endswith(suff):
+                if not r.path.endswith(suff):
                     filtered.append(r)
 
         final_refs = filtered
