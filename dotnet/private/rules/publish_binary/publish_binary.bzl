@@ -115,6 +115,14 @@ def _get_assembly_files(assembly_info, transitive_runtime_deps):
         data += dep.data
     return (libs, native, data)
 
+def _skip_ambiguous_assembly(assembly_info, file):
+    if assembly_info.assembly_disamb:
+        for key, val in assembly_info.assembly_disamb.items():
+            if file.basename.find(key) != -1:
+                if file.dirname.find(val) == -1:
+                    return True
+    return False
+
 def _copy_to_publish(ctx, runtime_identifier, publish_binary_info, binary_info, assembly_info, transitive_runtime_deps, repo_mapping_manifest):
     is_windows = ctx.target_platform_has_constraint(ctx.attr._windows_constraint[platform_common.ConstraintValueInfo])
     inputs = [binary_info.app_host]
@@ -131,19 +139,12 @@ def _copy_to_publish(ctx, runtime_identifier, publish_binary_info, binary_info, 
     # All managed DLLs are copied next to the app host in the publish directory
     # Except those removed for disambiguation
     for file in libs:
-        if assembly_info.assembly_disamb:
-            skip = False
-            for key, val in assembly_info.assembly_disamb.items():
-                if file.basename.find(key) != -1:
-                    if file.dirname.find(val) == -1:
-                        skip = True
-            if skip:
-                continue
+        if _skip_ambiguous_assembly(assembly_info, file):
+            continue
 
         output = ctx.actions.declare_file(
             "{}/publish/{}/{}".format(ctx.label.name, runtime_identifier, file.basename),
         )
-        print("Copying {} to {}".format(file, output))
         outputs.append(output)
         inputs.append(file)
         _copy_file(script_body, file, output, is_windows = is_windows)
@@ -151,6 +152,9 @@ def _copy_to_publish(ctx, runtime_identifier, publish_binary_info, binary_info, 
     # When publishing a self-contained binary, we need to copy the native DLLs to the
     # publish directory as well.
     for file in native:
+        if _skip_ambiguous_assembly(assembly_info, file):
+            continue
+
         inputs.append(file)
         output = ctx.actions.declare_file(
             "{}/publish/{}/{}".format(ctx.label.name, runtime_identifier, file.basename),
@@ -172,6 +176,9 @@ def _copy_to_publish(ctx, runtime_identifier, publish_binary_info, binary_info, 
     # next to the the DLL based on argv0 of the running process if
     # RUNFILES_DIR/RUNFILES_MANIFEST_FILE/RUNFILES_MANIFEST_ONLY is not set).
     for file in data:
+        if _skip_ambiguous_assembly(assembly_info, file):
+            continue
+
         inputs.append(file)
         manifest_path = to_manifest_path(ctx, file)
         output = ctx.actions.declare_file(
@@ -201,6 +208,9 @@ def _copy_to_publish(ctx, runtime_identifier, publish_binary_info, binary_info, 
                 runtime_pack.data,
             )
             for file in runtime_pack_files.to_list():
+                if _skip_ambiguous_assembly(assembly_info, file):
+                    continue
+
                 output = ctx.actions.declare_file(file.basename, sibling = app_host_copy)
                 outputs.append(output)
                 inputs.append(file)
