@@ -60,7 +60,7 @@ def AssemblyAction(
         deps,
         exports,
         targeting_packs,
-        exclude_assembly_patterns,
+        assembly_disamb,
         internals_visible_to,
         keyfile,
         features,
@@ -109,6 +109,7 @@ def AssemblyAction(
         out: Specifies the output file name.
         target: Specifies the format of the output file by using one of four options.
         target_framework: The target framework moniker for the assembly.
+        assembly_disamb: A mapping of assembly filenames (or prefixes) to the preferred providing package.
         toolchain: The toolchain that supply the C# compiler.
         strict_deps: Whether or not to use strict dependencies.
         generate_documentation_file: Whether or not to output XML docs for the compiled dll.
@@ -165,11 +166,11 @@ def AssemblyAction(
             features,
             langversion,
             irefs,
-            exclude_assembly_patterns,
             framework_files,
             resources,
             srcs,
             depset(compile_data, transitive = [transitive_compile_data]),
+            assembly_disamb,
             subsystem_version,
             target,
             target_name,
@@ -211,11 +212,11 @@ def AssemblyAction(
             features,
             langversion,
             irefs,
-            exclude_assembly_patterns,
             framework_files,
             resources,
             srcs + [internals_visible_to_cs],
             depset(compile_data, transitive = [transitive_compile_data]),
+            assembly_disamb,
             subsystem_version,
             target,
             target_name,
@@ -246,11 +247,11 @@ def AssemblyAction(
             features,
             langversion,
             irefs,
-            exclude_assembly_patterns,
             framework_files,
             resources,
             srcs,
             depset(compile_data, transitive = [transitive_compile_data]),
+            assembly_disamb,
             subsystem_version,
             target,
             target_name,
@@ -291,6 +292,7 @@ def AssemblyAction(
         native = [],
         deps = depset([dep[DotnetAssemblyRuntimeInfo] for dep in deps] + [toolchain.host_model[DotnetAssemblyRuntimeInfo]] if include_host_model_dll else [dep[DotnetAssemblyRuntimeInfo] for dep in deps], transitive = [dep[DotnetAssemblyRuntimeInfo].deps for dep in deps]),
         nuget_info = None,
+        assembly_disamb = assembly_disamb,
         direct_deps_depsjson_fragment = {dep[DotnetAssemblyRuntimeInfo].name: dep[DotnetAssemblyRuntimeInfo].version for dep in deps},
     ))
 
@@ -306,11 +308,11 @@ def _compile(
         features,
         langversion,
         refs,
-        exclude_assembly_patterns,
         framework_files,
         resources,
         srcs,
         compile_data,
+        assembly_disamb,
         subsystem_version,
         target,
         target_name,
@@ -398,13 +400,15 @@ def _compile(
 
     # assembly references
     final_refs = depset(framework_files, transitive = [refs]).to_list()
-    if exclude_assembly_patterns:
+
+    if assembly_disamb:
         filtered = []
         for r in final_refs:
             exclude = False
-            for suff in exclude_assembly_patterns:
-                if r.path.endswith(suff):
-                    exclude = True
+            for key, val in assembly_disamb.items():
+                if r.path.find(key) != -1:
+                    if r.path.find(val) == -1:
+                        exclude = True
             if not exclude:
                 filtered.append(r)
 

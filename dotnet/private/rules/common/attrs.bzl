@@ -72,11 +72,6 @@ COMMON_ATTRS = {
         default = [],
         allow_empty = True,
     ),
-    "exclude_assembly_patterns": attr.string_list(
-        doc = "Match patterns before populating assembly list, exclude matched from C# compiler command line",
-        default = [],
-        allow_empty = True,
-    ),
     "internals_visible_to": attr.string_list(
         doc = "Other libraries that can see the assembly's internal symbols. Using this rather than the InternalsVisibleTo assembly attribute will improve build caching.",
     ),
@@ -97,6 +92,11 @@ COMMON_ATTRS = {
         providers = [DotnetAssemblyCompileInfo, DotnetAssemblyRuntimeInfo],
         cfg = tfm_transition,
         allow_empty = False,
+    ),
+    "assembly_disamb": attr.string_dict(
+        doc = "A mapping of assembly filenames (or prefixes) to the preferred providing package",
+        default = {},
+        allow_empty = True,
     ),
     "treat_warnings_as_errors": attr.bool(
         doc = "Treat all compiler warnings as errors. Note that this attribute can not be used in conjunction with warnings_as_errors.",

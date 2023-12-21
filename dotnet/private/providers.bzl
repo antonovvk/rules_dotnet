@@ -31,6 +31,7 @@ DotnetAssemblyRuntimeInfo = provider(
         "data": "list[File]: Runtime data files",
         "nuget_info": "NugetInfo",
         "deps": "depset[DotnetAssemblyRuntimeInfo]: The direct and transitive runtime dependencies of the assembly",
+        "assembly_disamb": "dict: A mapping of assembly filenames (or prefixes) to the preferred providing package",
         "direct_deps_depsjson_fragment": "struct: A struct containing the direct deps of the target. This is used during deps.json generation and is generated in the provider to avoid making the provider too bloated and thus making analysis slower.",
     },
 )
