@@ -50,7 +50,7 @@ publish_binary = rule(
         "self_contained": attr.bool(
             doc = """
             Whether the binary should be self-contained.
-            
+
             If true, the binary will be published as a self-contained but you need to provide
             a runtime pack in the `runtime_packs` attribute. At some point the rules might
             resolve the runtime pack automatically.
@@ -129,10 +129,21 @@ def _copy_to_publish(ctx, runtime_identifier, publish_binary_info, binary_info, 
     (libs, native, data) = _get_assembly_files(assembly_info, transitive_runtime_deps)
 
     # All managed DLLs are copied next to the app host in the publish directory
+    # Except those removed for disambiguation
     for file in libs:
+        if assembly_info.assembly_disamb:
+            skip = False
+            for key, val in assembly_info.assembly_disamb.items():
+                if file.basename.find(key) != -1:
+                    if file.dirname.find(val) == -1:
+                        skip = True
+            if skip:
+                continue
+
         output = ctx.actions.declare_file(
             "{}/publish/{}/{}".format(ctx.label.name, runtime_identifier, file.basename),
         )
+        print("Copying {} to {}".format(file, output))
         outputs.append(output)
         inputs.append(file)
         _copy_file(script_body, file, output, is_windows = is_windows)
