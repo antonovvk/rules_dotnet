@@ -390,13 +390,14 @@ def _compile(
 
     # analyzers
     args.add_all(analyzer_assemblies, format_each = "/analyzer:%s")
-    args.add_all(additionalfiles, format_each = "/additionalfile:%s")
+    args.add_all(additionalfiles, format_each = "/additionalfile:\"%s\"")
 
     # .cs files
-    args.add_all(srcs)
+    # Wrap in "" to handle spaces in file names
+    args.add_all(srcs, format_each = "\"%s\"")
 
     # resources
-    args.add_all(resources, format_each = "/resource:%s")
+    args.add_all(resources, format_each = "/resource:\"%s\"")
 
     # defines
     args.add_all(defines, format_each = "/d:%s")
