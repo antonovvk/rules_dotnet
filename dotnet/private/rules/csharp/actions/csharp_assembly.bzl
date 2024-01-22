@@ -394,22 +394,7 @@ def _compile(
 
     # assembly references
     final_refs = depset(framework_files, transitive = [refs]).to_list()
-
-    if assembly_disamb:
-        filtered = []
-        for r in final_refs:
-            exclude = False
-            for key, val in assembly_disamb.items():
-                if r.path.find(key) != -1:
-                    if r.path.find(val) == -1:
-                        exclude = True
-            if not exclude:
-                filtered.append(r)
-
-        final_refs = filtered
-
     format_ref_arg(args, final_refs)
-
 
     # analyzers
     args.add_all(analyzer_assemblies, format_each = "/analyzer:%s")
